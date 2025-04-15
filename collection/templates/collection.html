@@ -1,0 +1,8 @@
+<h2>Your Pokémon Collection</h2>
+<ul>
+    {% for pokemon in pokemons %}
+        <li>{{ pokemon.name }} ({{ pokemon.type }})</li>
+    {% empty %}
+        <li>You have no Pokémon in your collection yet.</li>
+    {% endfor %}
+</ul>
