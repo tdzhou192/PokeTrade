@@ -1,8 +1,40 @@
 <h2>Your Pokémon Collection</h2>
+
+<!-- Search Form -->
+<form method="get" action="{% url 'collection' %}">
+    <input type="text" name="search" placeholder="Search Pokémon by name" value="{{ request.GET.search }}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- Sorting Options -->
+<form method="get" action="{% url 'collection' %}">
+    <label for="sort_by">Sort by:</label>
+    <select name="sort_by" id="sort_by" onchange="this.form.submit()">
+        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
+        <option value="type" {% if sort_by == 'type' %}selected{% endif %}>Type</option>
+        <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Date Received</option>
+    </select>
+</form>
+
+<!-- Display the search query -->
+{% if request.GET.search %}
+    <p>Showing results for: <strong>{{ request.GET.search }}</strong></p>
+{% endif %}
+
+<!-- Pokémon List -->
 <ul>
     {% for pokemon in pokemons %}
-        <li>{{ pokemon.name }} ({{ pokemon.type }})</li>
+        <li>
+            {{ pokemon.name }} ({{ pokemon.type }})
+
+            <!-- Display favorite toggle link -->
+            {% if pokemon.is_favorite %}
+                <span>❤️</span> <!-- Heart icon if it's a favorite -->
+            {% else %}
+                <a href="{% url 'toggle_favorite' pokemon.id %}">💔</a> <!-- Heart outline link to toggle -->
+            {% endif %}
+        </li>
     {% empty %}
-        <li>You have no Pokémon in your collection yet.</li>
+        <li>No Pokémon found matching your search.</li>
     {% endfor %}
 </ul>
