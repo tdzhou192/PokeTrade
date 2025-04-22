@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% if pokemon %}{{ pokemon.name|capfirst }} Details{% else %}Error{% endif %}</title>
+  </head>
+  <body>
+    {% if pokemon %}
+    <h1>{{ pokemon.name|capfirst }}</h1>
+    <!-- Use sprite_url from view which follows the official artwork URL pattern -->
+    <img src="{{ sprite_url }}" alt="{{ pokemon.name }}" style="width:100px;">
+    <p>Height: {{ pokemon.height }}</p>
+    <p>Weight: {{ pokemon.weight }}</p>
+
+    <hr>
+    <h2>Trade This Pokémon</h2>
+    <p>Select one of your Pokémon to trade with:</p>
+    <form method="post" action="{% url 'trade_pokemon' pokemon.id %}">
+    {% csrf_token %}
+    <select name="owned_pokemon_id" id="owned_pokemon_id">
+        {% for owned in owned_pokemon_list %}
+        <option value="{{ owned.id }}" data-sprite="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{{owned.poke_id}}.png">
+            {{ owned.name }} ({{ owned.type }})
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Trade</button>
+    </form>
+    <img id="owned_pokemon_image" src="" alt="Selected Pokémon" style="width:100px; display:block; margin-top:10px;">
+    <script>
+    document.getElementById('owned_pokemon_id').addEventListener('change', function(){
+        var selectedOption = this.options[this.selectedIndex];
+        var spriteUrl = selectedOption.getAttribute('data-sprite');
+        document.getElementById('owned_pokemon_image').src = spriteUrl;
+    });
+    window.onload = function() {
+        var selectElem = document.getElementById('owned_pokemon_id');
+        if(selectElem && selectElem.options.length > 0) {
+            var spriteUrl = selectElem.options[selectElem.selectedIndex].getAttribute('data-sprite');
+            document.getElementById('owned_pokemon_image').src = spriteUrl;
+        }
+    };
+    </script>
+    {% else %}
+    <h1>Error Loading Pokémon</h1>
+    <p>{{ error }}</p>
+    {% endif %}
+    <p><a href="{% url 'marketplace' %}">Back to Marketplace</a></p>
+  </body>
+</html>
