@@ -21,20 +21,30 @@
     <p>Showing results for: <strong>{{ request.GET.search }}</strong></p>
 {% endif %}
 
-<!-- Pokémon List -->
 <ul>
     {% for pokemon in pokemons %}
         <li>
-            {{ pokemon.name }} ({{ pokemon.type }})
-
-            <!-- Display favorite toggle link -->
-            {% if pokemon.is_favorite %}
-                <span>❤️</span> <!-- Heart icon if it's a favorite -->
-            {% else %}
-                <a href="{% url 'toggle_favorite' pokemon.id %}">💔</a> <!-- Heart outline link to toggle -->
-            {% endif %}
+            <div style="display:flex; align-items: center; gap: 10px;">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{{pokemon.poke_id}}.png" style="width: 100px; height: auto;">
+                <div>
+                    <strong>{{ pokemon.name }}</strong> ({{ pokemon.type }})
+                    {% if pokemon.is_favorite %}
+                        <span>❤️</span>
+                    {% else %}
+                        <a href="{% url 'toggle_favorite' pokemon.id %}">💔</a>
+                    {% endif %}
+                </div>
+            </div>
         </li>
     {% empty %}
         <li>No Pokémon found matching your search.</li>
     {% endfor %}
 </ul>
+
+<!-- If your collection is empty, show a button to populate it. -->
+{% if pokemons|length == 0 %}
+<form method="post" action="{% url 'populate_collection' %}">
+    {% csrf_token %}
+    <button type="submit">Add Random Pokémon to My Collection</button>
+</form>
+{% endif %}
