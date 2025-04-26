@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Marketplace</title>
+  </head>
+  <body>
+    <h1>Marketplace</h1>
+    <ul style="list-style: none; padding: 0;">
+       {% for pokemon in pokemon_list %}
+         <li style="display: inline-block; margin: 10px; text-align: center;">
+           <a href="{% url 'pokemon_detail' pokemon.id %}">
+             <img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.name }}" style="width: 100px; height: auto;">
+             <p>{{ pokemon.name|capfirst }}</p>
+           </a>
+         </li>
+       {% endfor %}
+    </ul>
+    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
+  </body>
+</html>
