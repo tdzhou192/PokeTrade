@@ -57,3 +57,13 @@ class TradeOffer(models.Model):
 
     def __str__(self):
         return f"TradeOffer from {self.buyer.username} for {self.listing.name} ({self.status})"
+    
+class Purchase(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    seller = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='sales')
+    pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE)
+    price = models.IntegerField(default=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.pokemon.name} purchased by {self.buyer.username}"
