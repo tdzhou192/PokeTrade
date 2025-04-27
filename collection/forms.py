@@ -21,11 +21,11 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(CustomUserCreationForm, self).__init__(*args, **kwargs)
 
-        for fieldname in ['email', 'password1', 'password2']:
-            self.fields[fieldname].help_text = None
+        for fieldname in ['email', 'username', 'password1', 'password2']:
+            self.fields[fieldname].help_text = ['']
             self.fields[fieldname].widget.attrs.update(
                     {'class': 'form-control'})
 
     class Meta:
         model = User
-        fields = ('email', 'password1', 'password2')
+        fields = ('email', 'username', 'password1', 'password2')
