@@ -13,6 +13,14 @@ from django.forms.utils import ErrorList
 User = get_user_model()
 
 @login_required
+def home(request):
+    return render(request, 'home.html')
+
+@login_required
+def about(request):
+    return render(request, 'about.html')
+
+@login_required
 def login(request):
     template_data = {}
     template_data['title'] = 'Login'

@@ -1,0 +1,93 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>{% block title %}PokéTrade{% endblock %}</title>
+   <style>
+       body {
+           margin: 0;
+           font-family: 'Poppins', Arial, sans-serif;
+           background-color: #f2f3f7;
+       }
+       nav {
+           background-color: #c4c4c4;
+           padding: 10px 30px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+       }
+       .logo {
+           display: flex;
+           align-items: center;
+       }
+       .logo img {
+           height: 35px;
+           width: 100%;
+           margin-right: 10px;
+       }
+       .logo span {
+           font-size: 24px;
+           font-weight: bold;
+           color: #EE2626;
+           text-decoration: none;
+       }
+       .nav-links {
+           display: flex;
+           align-items: center;
+       }
+       .nav-links a {
+           margin-left: 30px;
+           text-decoration: none;
+           font-weight: 600;
+           font-size: 16px;
+           transition: color 0.3s;
+       }
+       .nav-links a.about-link {
+           color: #EE2626;
+       }
+       .nav-links a.collection-link,
+       .nav-links a.marketplace-link,
+       .nav-links a.login-link {
+           color: #0075BE;
+       }
+       .nav-links a:hover {
+           text-decoration: underline;
+       }
+       main {
+           padding: 20px;
+       }
+   </style>
+</head>
+
+
+<body>
+
+
+<nav>
+   <div class="logo">
+       <a href="{% url 'home' %}" style="display: flex; align-items: center; text-decoration: none;">
+           <img src="{% static 'images/logo.png' %}" alt="PokéTrade Logo">
+       </a>
+   </div>
+
+
+   <div class="nav-links">
+           <a href="{% url 'about' %}" class="about-link">About</a>
+           <a href="{% url 'collection' %}" class="collection-link">Collection</a>
+           <a href="{% url 'marketplace' %}" class="marketplace-link">Marketplace</a>
+   </div>
+</nav>
+
+
+<main>
+   {% block content %}
+   {% endblock %}
+</main>
+
+
+</body>
+</html>

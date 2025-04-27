@@ -3,8 +3,9 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
+    path('home/', views.home, name='home'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('about/', views.about_view, name='about'),
+    path('about/', views.about, name='about'),
     path('signup/', views.signup, name='signup'),
     path('', views.collection_view, name='collection'),
     path('admin/', admin.site.urls),
