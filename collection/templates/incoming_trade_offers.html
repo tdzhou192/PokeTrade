@@ -1,24 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Incoming Trade Offers</title>
-  </head>
-  <body>
-    <h1>Incoming Trade Offers</h1>
-    <ul>
-      {% for offer in offers %}
-      <li>
-         <p><strong>{{ offer.buyer.username }}</strong> offers their Pokémon <em>{{ offer.offered_pokemon.name }}</em> for your listed Pokémon <em>{{ offer.listing.name }}</em>.</p>
-         <p>
-             <a href="{% url 'accept_trade_offer' offer.id %}">Accept</a> |
-             <a href="{% url 'decline_trade_offer' offer.id %}">Decline</a>
-         </p>
-      </li>
-      {% empty %}
-         <li>No pending trade offers.</li>
-      {% endfor %}
+    <title>Incoming Trade Offers - PokéTrade</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .header-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header-box h2 {
+            font-size: 36px;
+            color: #ff3c00;
+            margin: 0;
+        }
+        .offers-list {
+            list-style: none;
+            padding: 0;
+        }
+        .offer-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .offer-card p {
+            margin: 10px 0;
+        }
+        .offer-card a {
+            color: #2196F3;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        .offer-card a:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-box">
+        <h2>Incoming Trade Offers</h2>
+    </div>
+    <ul class="offers-list">
+        {% for offer in offers %}
+        <li class="offer-card">
+            <p><strong>{{ offer.buyer.username }}</strong> offers their Pokémon <em>{{ offer.offered_pokemon.name }}</em> for your listed Pokémon <em>{{ offer.listing.name }}</em>.</p>
+            <p>
+                <a href="{% url 'accept_trade_offer' offer.id %}">Accept</a> |
+                <a href="{% url 'decline_trade_offer' offer.id %}">Decline</a>
+            </p>
+        </li>
+        {% empty %}
+        <li class="offer-card">
+            <p>No pending trade offers.</p>
+        </li>
+        {% endfor %}
     </ul>
-    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
-  </body>
+    <a href="{% url 'collection' %}" class="back-link">← Back to Collection</a>
+</body>
 </html>

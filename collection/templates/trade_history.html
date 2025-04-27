@@ -1,49 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Trade & Purchase History</title>
-  </head>
-  <body>
-    <h1>Trade & Purchase History</h1>
-    <ul>
-      {% for event in history %}
-        {% if event.type == 'trade' %}
-          <li>
-            <p>
-              Trade: <strong>{{ event.data.listing.name }}</strong> was traded.
-              {% if event.data.buyer == request.user %}
-                You received this Pokémon from {{ event.data.seller.username }}.
-              {% else %}
-                You sent your Pokémon {{ event.data.offered_pokemon.name }} to {{ event.data.buyer.username }}.
-              {% endif %}
-            </p>
-            <p>Traded on: {{ event.created_at|date:"M d, Y H:i" }}</p>
-          </li>
-        {% elif event.type == 'purchase' %}
-          <li>
-            <p>
-              Purchase: You purchased <strong>{{ event.data.pokemon.name }}</strong>
-              {% if event.data.seller %}
-                from {{ event.data.seller.username }}
-              {% else %}
-                from the system
-              {% endif %}.
-            </p>
-            <p>Purchased on: {{ event.created_at|date:"M d, Y H:i" }}</p>
-          </li>
-        {% elif event.type == 'sale' %}
-          <li>
-            <p>
-              Sale: Your Pokémon <strong>{{ event.data.pokemon.name }}</strong> was purchased by {{ event.data.buyer.username }}.
-            </p>
-            <p>Sold on: {{ event.created_at|date:"M d, Y H:i" }}</p>
-          </li>
-        {% endif %}
-      {% empty %}
-        <li>No trade or purchase events found.</li>
-      {% endfor %}
+    <title>Trade & Purchase History - PokéTrade</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .header-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header-box h2 {
+            font-size: 36px;
+            color: #ff3c00;
+            margin: 0;
+        }
+        .history-list {
+            list-style: none;
+            padding: 0;
+        }
+        .history-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .history-card p {
+            margin: 10px 0;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-box">
+        <h2>Trade & Purchase History</h2>
+    </div>
+    <ul class="history-list">
+        {% for event in history %}
+            {% if event.type == 'trade' %}
+                <li class="history-card">
+                    <p>
+                        Trade: <strong>{{ event.data.listing.name }}</strong> was traded.
+                        {% if event.data.buyer == request.user %}
+                            You received this Pokémon from {{ event.data.seller.username }}.
+                        {% else %}
+                            You sent your Pokémon {{ event.data.offered_pokemon.name }} to {{ event.data.buyer.username }}.
+                        {% endif %}
+                    </p>
+                    <p>Traded on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+                </li>
+            {% elif event.type == 'purchase' %}
+                <li class="history-card">
+                    <p>
+                        Purchase: You purchased <strong>{{ event.data.pokemon.name }}</strong>
+                        {% if event.data.seller %}
+                            from {{ event.data.seller.username }}
+                        {% else %}
+                            from the system
+                        {% endif %}.
+                    </p>
+                    <p>Purchased on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+                </li>
+            {% elif event.type == 'sale' %}
+                <li class="history-card">
+                    <p>
+                        Sale: Your Pokémon <strong>{{ event.data.pokemon.name }}</strong> was purchased by {{ event.data.buyer.username }}.
+                    </p>
+                    <p>Sold on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+                </li>
+            {% endif %}
+        {% empty %}
+            <li class="history-card">
+                <p>No trade or purchase events found.</p>
+            </li>
+        {% endfor %}
     </ul>
-    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
-  </body>
+    <a href="{% url 'collection' %}" class="back-link">← Back to Collection</a>
+</body>
 </html>

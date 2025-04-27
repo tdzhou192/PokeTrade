@@ -239,13 +239,13 @@ def listed_pokemon_detail_view(request, pokemon_id):
     }
     return render(request, 'listed_pokemon_detail.html', context)
 
+from django.urls import reverse
+
+
 @login_required
 def purchase_listed_pokemon_view(request, pokemon_id):
-    """
-    Handle purchasing of a listed Pokémon.
-    Deduct the asking price from the buyer, credit the seller, update ownership, and unlist the Pokémon.
-    """
     from django.shortcuts import get_object_or_404
+    from .models import Purchase  # import the Purchase model
     if request.method == "POST":
         listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
         # Prevent sellers from purchasing their own listings
@@ -254,19 +254,29 @@ def purchase_listed_pokemon_view(request, pokemon_id):
         price = listing.price
         buyer_profile = request.user.profile
         seller_profile = listing.owner.profile
+        # Check if buyer has enough coins
         if buyer_profile.coins < price:
-            # Not enough coins; you can also add a message if desired.
-            return redirect('listed_pokemon_detail', pokemon_id=pokemon_id)
+            # Redirect back with a GET parameter so the template can display a message
+            return redirect(reverse('listed_pokemon_detail', args=[pokemon_id]) + "?insufficient_funds=1")
         # Deduct price from buyer and credit seller
         buyer_profile.coins -= price
         buyer_profile.save()
         seller_profile.coins += price
         seller_profile.save()
-        # Transfer ownership and unlist
+        # Capture the seller before transferring ownership
+        prev_seller = listing.owner
+        # Transfer ownership and unlist the Pokémon
         listing.owner = request.user
         listing.is_listed = False
         listing.price = None
         listing.save()
+        # Optionally create a Purchase record reflecting this transaction
+        Purchase.objects.create(
+            buyer=request.user,
+            seller=prev_seller,
+            pokemon=listing,
+            price=price,
+        )
     return redirect('collection')
 
 @login_required
@@ -434,40 +444,6 @@ def purchase_pokemon_view(request, pokemon_id):
     else:
         return redirect('marketplace')
 
-@login_required
-def purchase_listed_pokemon_view(request, pokemon_id):
-    from django.shortcuts import get_object_or_404
-    from .models import Purchase  # import the Purchase model
-    if request.method == "POST":
-        listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
-        # Prevent sellers from purchasing their own listings
-        if listing.owner == request.user:
-            return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
-        price = listing.price
-        buyer_profile = request.user.profile
-        seller_profile = listing.owner.profile
-        if buyer_profile.coins < price:
-            return redirect('listed_pokemon_detail', pokemon_id=pokemon_id)
-        # Deduct price from buyer and credit seller
-        buyer_profile.coins -= price
-        buyer_profile.save()
-        seller_profile.coins += price
-        seller_profile.save()
-        # Capture the seller before transferring ownership
-        prev_seller = listing.owner
-        # Transfer ownership and unlist the Pokémon
-        listing.owner = request.user
-        listing.is_listed = False
-        listing.price = None
-        listing.save()
-        # Create a Purchase record reflecting this transaction
-        Purchase.objects.create(
-            buyer=request.user,
-            seller=prev_seller,
-            pokemon=listing,
-            price=price,
-        )
-    return redirect('collection')
 
 
 def about_view(request):
