@@ -141,6 +141,7 @@
             <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
             <option value="type" {% if sort_by == 'type' %}selected{% endif %}>Type</option>
             <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Date Received</option>
+            <option value="favorite" {% if sort_by == 'favorite' %}selected{% endif %}>Favorite</option>
         </select>
     </form>
 </div>
@@ -156,11 +157,13 @@
             <h3>{{ pokemon.name }}</h3>
             <p>Type: {{ pokemon.type }}</p>
 
-            {% if pokemon.is_favorite %}
-                <div class="favorite-heart">❤️</div>
-            {% else %}
-                <a href="{% url 'toggle_favorite' pokemon.id %}">💔</a>
-            {% endif %}
+            <a href="{% url 'toggle_favorite' pokemon.id %}" class="favorite-heart">
+                {% if pokemon.is_favorite %}
+                    ❤️
+                {% else %}
+                    💔
+                {% endif %}
+            </a>
 
             <p><a href="{% url 'owned_pokemon_detail' pokemon.id %}">View Details</a></p>
         </div>

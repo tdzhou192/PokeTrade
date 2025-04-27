@@ -2,42 +2,128 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="../static/login_design.css" />
-    <link rel="stylesheet" href="../static/home_design.css" />
+    <meta charset="UTF-8">
+    <title>Login - PokéTrade</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .header-box {
+            margin-bottom: 30px;
+        }
+        .header-box h2 {
+            font-size: 36px;
+            color: #ff3c00;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+        }
+        .error-message {
+            color: #ff3c00;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .signup-link {
+            margin-top: 20px;
+            color: #666;
+        }
+        .signup-link a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .form-error {
+            color: #ff3c00;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
   </head>
   <body>
-    <div class="desktop">
-      <div class="div">
-        <div class="frame">
-          <div class="frame-2">
-            <div class="text-wrapper">About</div>
-            <div class="text-wrapper-2">Login</div>
-          </div>
-          <img class="group" src="img/group-4.png" />
+    <div class="login-container">
+        <div class="header-box">
+            <h2>Log In to PokéTrade</h2>
         </div>
-        <div class="overlap">
-          <div class="overlap-group-wrapper">
-            <div class="overlap-group">
-              <div class="text-wrapper-3">PokéTrade</div>
-              <div class="group-2">
-                <p class="p">Collect, trade, and manage your Pokémon today!</p>
-                <p class="text-wrapper-4">Sign up now to get started collecting and earning Pokémon!</p>
-              </div>
+        <form method="post" action="{% url 'login' %}" novalidate>
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="form-error">
+                    Your username and password didn't match. Please try again.
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" required>
             </div>
-          </div>
-          <img class="image" src="img/image-2.png" />
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="submit-button">Log In</button>
+        </form>
+        <div class="signup-link">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
         </div>
-        <div class="overlap-2">
-          <div class="overlap-wrapper">
-            <div class="div-wrapper"><div class="text-wrapper-5">Login</div></div>
-          </div>
-          <div class="group-3">
-            <div class="text-wrapper-6">About us</div>
-            <img class="line" src="img/line-1.svg" />
-          </div>
-        </div>
-      </div>
     </div>
   </body>
 </html>
