@@ -391,9 +391,97 @@ def decline_trade_offer_view(request, offer_id):
 @login_required
 def trade_history_view(request):
     from django.db.models import Q
-    # Retrieve trade offers that were accepted and involve the current user as buyer or seller.
-    offers = TradeOffer.objects.filter(
+    from .models import Purchase  # ensure Purchase is imported
+    # Get accepted trade offers involving the current user
+    trade_offers = TradeOffer.objects.filter(
         Q(buyer=request.user) | Q(seller=request.user),
         status='accepted'
-    ).order_by('-created_at')
-    return render(request, 'trade_history.html', {'offers': offers})
+    )
+    # Get purchase transactions where the current user is either buyer or seller
+    purchases = Purchase.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
+    history = []
+    for t in trade_offers:
+        history.append({
+            'type': 'trade',
+            'created_at': t.created_at,
+            'data': t,
+        })
+    for p in purchases:
+        # Determine event type based on user role
+        event_type = 'purchase' if p.buyer == request.user else 'sale'
+        history.append({
+            'type': event_type,
+            'created_at': p.created_at,
+            'data': p,
+        })
+    history.sort(key=lambda x: x['created_at'], reverse=True)
+    return render(request, 'trade_history.html', {'history': history})
+
+@login_required
+def purchase_pokemon_view(request, pokemon_id):
+    import pokebase as pb
+    from .models import Purchase  # import the Purchase model
+    if request.method == "POST":
+        # Check if the user has enough coins (cost: 1000)
+        if request.user.profile.coins < 1000:
+            return redirect('marketplace')
+        # Deduct cost and update profile
+        request.user.profile.coins -= 1000
+        request.user.profile.save()
+        try:
+            p = pb.pokemon(pokemon_id)
+        except Exception as e:
+            return redirect('marketplace')
+        pokemon_type = p.types[0].type.name if p.types else "unknown"
+        # Create the new Pokemon in the user's collection and store it in a variable
+        new_pokemon = Pokemon.objects.create(
+            owner=request.user,
+            name=p.name,
+            type=pokemon_type,
+            poke_id=pokemon_id,
+        )
+        # Create a Purchase record (seller is None for system purchases)
+        Purchase.objects.create(
+            buyer=request.user,
+            seller=None,
+            pokemon=new_pokemon,
+            price=1000
+        )
+        return redirect('collection')
+    else:
+        return redirect('marketplace')
+
+@login_required
+def purchase_listed_pokemon_view(request, pokemon_id):
+    from django.shortcuts import get_object_or_404
+    from .models import Purchase  # import the Purchase model
+    if request.method == "POST":
+        listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
+        # Prevent sellers from purchasing their own listings
+        if listing.owner == request.user:
+            return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
+        price = listing.price
+        buyer_profile = request.user.profile
+        seller_profile = listing.owner.profile
+        if buyer_profile.coins < price:
+            return redirect('listed_pokemon_detail', pokemon_id=pokemon_id)
+        # Deduct price from buyer and credit seller
+        buyer_profile.coins -= price
+        buyer_profile.save()
+        seller_profile.coins += price
+        seller_profile.save()
+        # Capture the seller before transferring ownership
+        prev_seller = listing.owner
+        # Transfer ownership and unlist the Pokémon
+        listing.owner = request.user
+        listing.is_listed = False
+        listing.price = None
+        listing.save()
+        # Create a Purchase record reflecting this transaction
+        Purchase.objects.create(
+            buyer=request.user,
+            seller=prev_seller,
+            pokemon=listing,
+            price=price,
+        )
+    return redirect('collection')

@@ -2,21 +2,46 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Trade History</title>
+    <title>Trade & Purchase History</title>
   </head>
   <body>
-    <h1>Trade History</h1>
+    <h1>Trade & Purchase History</h1>
     <ul>
-      {% for offer in offers %}
-      <li>
-        <p>
-          <strong>{{ offer.listing.name }}</strong> was traded.
-          You {% if offer.buyer == request.user %}received this Pokémon from {{ offer.seller.username }}{% else %}sent your Pokémon {{ offer.offered_pokemon.name }} to {{ offer.buyer.username }}{% endif %}.
-        </p>
-        <p>Traded on: {{ offer.created_at|date:"M d, Y H:i" }}</p>
-      </li>
+      {% for event in history %}
+        {% if event.type == 'trade' %}
+          <li>
+            <p>
+              Trade: <strong>{{ event.data.listing.name }}</strong> was traded.
+              {% if event.data.buyer == request.user %}
+                You received this Pokémon from {{ event.data.seller.username }}.
+              {% else %}
+                You sent your Pokémon {{ event.data.offered_pokemon.name }} to {{ event.data.buyer.username }}.
+              {% endif %}
+            </p>
+            <p>Traded on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+          </li>
+        {% elif event.type == 'purchase' %}
+          <li>
+            <p>
+              Purchase: You purchased <strong>{{ event.data.pokemon.name }}</strong>
+              {% if event.data.seller %}
+                from {{ event.data.seller.username }}
+              {% else %}
+                from the system
+              {% endif %}.
+            </p>
+            <p>Purchased on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+          </li>
+        {% elif event.type == 'sale' %}
+          <li>
+            <p>
+              Sale: Your Pokémon <strong>{{ event.data.pokemon.name }}</strong> was purchased by {{ event.data.buyer.username }}.
+            </p>
+            <p>Sold on: {{ event.created_at|date:"M d, Y H:i" }}</p>
+          </li>
+        {% endif %}
       {% empty %}
-      <li>No accepted trades yet.</li>
+        <li>No trade or purchase events found.</li>
       {% endfor %}
     </ul>
     <p><a href="{% url 'collection' %}">Back to Collection</a></p>
