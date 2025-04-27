@@ -24,4 +24,5 @@ urlpatterns = [
     path('outgoing_trade_offers/', views.outgoing_trade_offers_view, name='outgoing_trade_offers'),
     path('accept_trade_offer/<int:offer_id>/', views.accept_trade_offer_view, name='accept_trade_offer'),
     path('decline_trade_offer/<int:offer_id>/', views.decline_trade_offer_view, name='decline_trade_offer'),
+    path('trade_history/', views.trade_history_view, name='trade_history'),
 ]

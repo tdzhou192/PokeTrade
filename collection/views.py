@@ -38,6 +38,8 @@ def toggle_favorite(request, pokemon_id):
 @login_required
 def marketplace_view(request):
     import pokebase as pb
+    # Get the search query parameter
+    search_query = request.GET.get('search', '')
     pokemon_list = []
     # Fetch the first 20 Pokémon from the API
     for i in range(1, 21):
@@ -52,11 +54,16 @@ def marketplace_view(request):
         except Exception as e:
             continue
     coins = request.user.profile.coins
-    listings = Pokemon.objects.filter(is_listed=True)
+    # Filter listings by Pokémon name if a search query is provided, otherwise show all listings
+    if search_query:
+        listings = Pokemon.objects.filter(is_listed=True, name__icontains=search_query)
+    else:
+        listings = Pokemon.objects.filter(is_listed=True)
     return render(request, 'marketplace.html', {
         'pokemon_list': pokemon_list,
         'coins': coins,
         'listings': listings,
+        'search_query': search_query,
     })
 # ... existing code above remains unchanged ...
 
@@ -380,3 +387,13 @@ def decline_trade_offer_view(request, offer_id):
     offer.status = 'denied'
     offer.save()
     return redirect('incoming_trade_offers')
+
+@login_required
+def trade_history_view(request):
+    from django.db.models import Q
+    # Retrieve trade offers that were accepted and involve the current user as buyer or seller.
+    offers = TradeOffer.objects.filter(
+        Q(buyer=request.user) | Q(seller=request.user),
+        status='accepted'
+    ).order_by('-created_at')
+    return render(request, 'trade_history.html', {'offers': offers})
