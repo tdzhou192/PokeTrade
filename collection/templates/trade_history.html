@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Trade History</title>
+  </head>
+  <body>
+    <h1>Trade History</h1>
+    <ul>
+      {% for offer in offers %}
+      <li>
+        <p>
+          <strong>{{ offer.listing.name }}</strong> was traded.
+          You {% if offer.buyer == request.user %}received this Pokémon from {{ offer.seller.username }}{% else %}sent your Pokémon {{ offer.offered_pokemon.name }} to {{ offer.buyer.username }}{% endif %}.
+        </p>
+        <p>Traded on: {{ offer.created_at|date:"M d, Y H:i" }}</p>
+      </li>
+      {% empty %}
+      <li>No accepted trades yet.</li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
+  </body>
+</html>
