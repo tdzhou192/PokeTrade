@@ -6,6 +6,14 @@ from .models import Pokemon
 from .models import TradeOffer
 
 @login_required
+def about(request):
+    return render(request, 'about.html')
+
+@login_required
+def home(request):
+    return render(request, 'home.html')
+
+@login_required
 def collection_view(request):
     search_query = request.GET.get('search', '')
     sort_by = request.GET.get('sort_by', 'name')
