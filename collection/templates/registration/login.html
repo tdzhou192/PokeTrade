@@ -1,15 +1,43 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../static/login_design.css" />
+    <link rel="stylesheet" href="../static/home_design.css" />
   </head>
   <body>
-    <h2>Login</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Login</button>
-    </form>
+    <div class="desktop">
+      <div class="div">
+        <div class="frame">
+          <div class="frame-2">
+            <div class="text-wrapper">About</div>
+            <div class="text-wrapper-2">Login</div>
+          </div>
+          <img class="group" src="img/group-4.png" />
+        </div>
+        <div class="overlap">
+          <div class="overlap-group-wrapper">
+            <div class="overlap-group">
+              <div class="text-wrapper-3">PokéTrade</div>
+              <div class="group-2">
+                <p class="p">Collect, trade, and manage your Pokémon today!</p>
+                <p class="text-wrapper-4">Sign up now to get started collecting and earning Pokémon!</p>
+              </div>
+            </div>
+          </div>
+          <img class="image" src="img/image-2.png" />
+        </div>
+        <div class="overlap-2">
+          <div class="overlap-wrapper">
+            <div class="div-wrapper"><div class="text-wrapper-5">Login</div></div>
+          </div>
+          <div class="group-3">
+            <div class="text-wrapper-6">About us</div>
+            <img class="line" src="img/line-1.svg" />
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
