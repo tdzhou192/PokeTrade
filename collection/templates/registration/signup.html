@@ -1,122 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Sign Up - PokéTrade</title>
-  <style>
-      body {
-          font-family: 'Poppins', Arial, sans-serif;
-          background-color: #f0f2f5;
-          margin: 0;
-          padding: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-      }
-      .signup-container {
-          background: white;
-          padding: 40px;
-          border-radius: 10px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          width: 100%;
-          max-width: 400px;
-          text-align: center;
-      }
-      .header-box {
-          margin-bottom: 30px;
-      }
-      .header-box h2 {
-          font-size: 36px;
-          color: #ff3c00;
-          margin: 0;
-      }
-      .form-group {
-          margin-bottom: 20px;
-          text-align: left;
-      }
-      .form-group label {
-          display: block;
-          margin-bottom: 5px;
-          color: #333;
-          font-weight: 500;
-      }
-      .form-group input {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          font-size: 16px;
-          box-sizing: border-box;
-      }
-      .form-group input:focus {
-          outline: none;
-          border-color: #4CAF50;
-          box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
-      }
-      .error-message {
-          color: #ff3c00;
-          font-size: 14px;
-          margin-top: 5px;
-      }
-      .submit-button {
-          background-color: #4CAF50;
-          color: white;
-          padding: 12px 20px;
-          border: none;
-          border-radius: 5px;
-          font-size: 16px;
-          cursor: pointer;
-          width: 100%;
-          transition: background-color 0.3s;
-      }
-      .submit-button:hover {
-          background-color: #45a049;
-      }
-      .login-link {
-          margin-top: 20px;
-          color: #666;
-      }
-      .login-link a {
-          color: #2196F3;
-          text-decoration: none;
-      }
-      .login-link a:hover {
-          text-decoration: underline;
-      }
-      .help-text {
-          font-size: 12px;
-          color: #666;
-          margin-top: 5px;
-      }
-  </style>
-</head>
-<body>
-  <div class="signup-container">
-      <div class="header-box">
-          <h2>Join PokéTrade</h2>
-      </div>
-      <form method="post" novalidate>
-          {% csrf_token %}
-          {% for field in form %}
-              <div class="form-group">
-                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  {{ field }}
-                  {% if field.help_text %}
-                      <div class="help-text">{{ field.help_text }}</div>
-                  {% endif %}
-                  {% if field.errors %}
-                      {% for error in field.errors %}
-                          <div class="error-message">{{ error }}</div>
-                      {% endfor %}
-                  {% endif %}
-              </div>
-          {% endfor %}
-          <button type="submit" class="submit-button">Create Account</button>
-      </form>
-      <div class="login-link">
-          Already have an account? <a href="{% url 'login' %}">Log in</a>
-      </div>
-  </div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - PokéTrade{% endblock %}
+
+{% block content %}
+<style>
+ .signup-container {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   min-height: 90vh;
+   margin: 0 auto;
+ }
+ .signup-box {
+   width: 100%;
+   max-width: 400px;
+   padding: 40px 30px;
+   background: none;
+   text-align: center;
+ }
+ .signup-box h2 {
+   font-size: 48px;
+   color: #EE2626;
+   margin-bottom: 0px;
+   font-weight: 700;
+ }
+ .signup-box p.subtitle {
+   color: #0075BE;
+   font-size: 15px;
+   margin-bottom: 30px;
+   margin-top: -5px;
+ }
+ .form-instructions {
+   text-align: left;
+   font-size: 13px;
+   color: #555;
+   background: #f9f9f9;
+   padding: 10px 15px;
+   border-radius: 8px;
+   margin-bottom: 20px;
+ }
+ form {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+ }
+ .input-group {
+   width: 100%;
+   text-align: left;
+   margin-bottom: 5px;
+ }
+ .input-group label {
+   width: 100%;
+   display: block;
+   margin-bottom: 5px;
+   color: #0075BE;
+   font-weight: bold;
+   font-size: 20px;
+ }
+ .input-group input {
+   width: 100%;
+   height: 65px;
+   padding: 20px;
+   border-radius: 15px;
+   border: none;
+   background-color: rgba(0, 117, 190, 0.5);
+   color: white;
+   font-size: 16px;
+   outline: none;
+   box-sizing: border-box;
+ }
+ .input-group input::placeholder {
+   color: white;
+ }
+ .field-error {
+   font-size: 13px;
+   color: #EE2626;
+   margin-top: 5px;
+ }
+ button[type="submit"] {
+   width: 100%;
+   height: 60px;
+   margin-top: 10px;
+   padding: 20px;
+   border: none;
+   border-radius: 25px;
+   background: #0075BE;
+   color: white;
+   font-size: 18px;
+   font-weight: 600;
+   cursor: pointer;
+   box-shadow: 0px 10px 30px rgba(0, 117, 190, 0.5);
+   transition: background 0.3s;
+ }
+ button[type="submit"]:hover {
+   background: linear-gradient(135deg, #2575fc, #6a11cb);
+ }
+ .links {
+   margin-top: 20px;
+   font-size: 14px;
+   text-align: center;
+ }
+ .links a {
+   text-decoration: none;
+   margin: 0 5px;
+   font-weight: 600;
+ }
+ .login-link {
+   color: #EE2626;
+   text-decoration: underline !important;
+   font-weight: bold;
+ }
+</style>
+
+<main>
+ <div class="signup-container">
+   <div class="signup-box">
+     <h2>Sign up now!</h2>
+     <p class="subtitle">Please enter your information to sign up.</p>
+
+     <form method="post" novalidate>
+       {% csrf_token %}
+
+       <div class="form-instructions">
+         <strong>Username:</strong> Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.<br><br>
+         <strong>Password:</strong>
+         <ul style="padding-left: 20px; margin-top: 5px;">
+           <li>Your password can’t be too similar to your other personal information.</li>
+           <li>Must contain at least 8 characters.</li>
+           <li>Can’t be a commonly used password.</li>
+           <li>Can’t be entirely numeric.</li>
+         </ul>
+       </div>
+
+       <!-- Email -->
+       <div class="input-group">
+         <label for="id_email">Email</label>
+         <input type="email" name="email" id="id_email" placeholder="Enter your email" value="{{ form.email.value|default_if_none:'' }}">
+         {% if form.email.errors %}
+           {% for error in form.email.errors %}
+             <div class="field-error">{{ error }}</div>
+           {% endfor %}
+         {% endif %}
+       </div>
+
+       <!-- Username -->
+       <div class="input-group">
+         <label for="id_username">Username</label>
+         <input type="text" name="username" id="id_username" placeholder="Enter your username" value="{{ form.username.value|default_if_none:'' }}">
+         {% if form.username.errors %}
+           {% for error in form.username.errors %}
+             <div class="field-error">{{ error }}</div>
+           {% endfor %}
+         {% endif %}
+       </div>
+
+       <!-- Password -->
+       <div class="input-group">
+         <label for="id_password1">Password</label>
+         <input type="password" name="password1" id="id_password1" placeholder="Enter your password">
+         {% if form.password1.errors %}
+           {% for error in form.password1.errors %}
+             <div class="field-error">{{ error }}</div>
+           {% endfor %}
+         {% endif %}
+       </div>
+
+       <!-- Password confirmation -->
+       <div class="input-group">
+         <label for="id_password2">Confirm Password</label>
+         <input type="password" name="password2" id="id_password2" placeholder="Confirm your password">
+         {% if form.password2.errors %}
+           {% for error in form.password2.errors %}
+             <div class="field-error">{{ error }}</div>
+           {% endfor %}
+         {% endif %}
+       </div>
+
+       <button type="submit">Sign Up</button>
+     </form>
+
+     <div class="links">
+       <p>Already have an account?
+         <a href="{% url 'login' %}" class="login-link">Log in</a>
+       </p>
+     </div>
+   </div>
+ </div>
+</main>
+
+{% endblock %}

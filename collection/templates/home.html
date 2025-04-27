@@ -1,5 +1,7 @@
-{% block title %}PokéTrade{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
 
+{% block title %}PokéTrade{% endblock %}
 
 {% block content %}
 <style>
@@ -61,10 +63,8 @@
  }
 </style>
 
-
 <div class="home-container">
  <h1 class="home-title">PokéTrade</h1>
-
 
  <div class="info-text-container">
    <div class="info-text">
@@ -74,9 +74,7 @@
      today!
    </div>
 
-
-   <img src="{% static 'images/pikachu.png' %}" alt="Pikachu" class="pikachu-img">
-
+   <img src="{% static 'img/pikachu.png' %}" alt="Pikachu" class="pikachu-img">
 
    <div class="info-text">
      Start now to<br>
@@ -85,7 +83,6 @@
      earning Pokémon!
    </div>
  </div>
-
 
  <div class="login-button">
    <a href="{% url 'login' %}">Login</a>
