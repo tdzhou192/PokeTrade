@@ -100,6 +100,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#password reset
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yazmenwalker22@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'zmja liwu uivg qyse'  # The App Password you just generated
+DEFAULT_FROM_EMAIL = 'yazmenwalker22@gmail.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

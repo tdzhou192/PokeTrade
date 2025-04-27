@@ -1,16 +1,43 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm   # added import
-from django.contrib.auth import login  
+from django.contrib.auth import login, authenticate
+
+from .forms import CustomUserCreationForm, CustomErrorList
 from .models import Pokemon
 from .models import TradeOffer
+from django.shortcuts import render
+from django.contrib.auth import get_user_model
+from django.forms.utils import ErrorList
+
+User = get_user_model()
 
 @login_required
+def login(request):
+    template_data = {}
+    template_data['title'] = 'Login'
+
+    if request.method == 'GET':
+        return render(request, 'registration/login.html', {'template_data': template_data})
+
+    elif request.method == 'POST':
+        email = request.POST['username']  # Treat 'username' as email input
+        password = request.POST['password']
+
+        # Authenticate using email (by default Django uses 'username')
+        user = authenticate(request, username=email, password=password)
+
+        if user is None:
+            template_data['error'] = 'The email or password is incorrect.'
+            return render(request, 'registration/login.html', {'template_data': template_data})
+        elif request.user.is_authenticated:
+            return redirect('registration/login.html')  # Redirect to home page after login
+
 def collection_view(request):
     search_query = request.GET.get('search', '')
     sort_by = request.GET.get('sort_by', 'name')
 
-    pokemons = Pokemon.objects.filter(owner=request.user)
+    pokemons = Pokemon.objects.filter(owner=request.user.id)
 
     if search_query:
         pokemons = pokemons.filter(name__icontains=search_query)
@@ -134,16 +161,34 @@ def populate_collection(request):
          return redirect('collection')
     
 def signup(request):
+    template_data = {}
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserCreationForm(request.POST, error_class=CustomErrorList)
+        email = request.POST.get('email')
+
+        if User.objects.filter(email=email).exists():
+            # If email exists, add an error and re-render the form
+            template_data['form'] = form
+            template_data['error'] = 'This email is already registered.'
+
+            return render(request, 'registration/signup.html', {'form': form})
+
         if form.is_valid():
-            user = form.save()
-            # Optionally log in the user automatically:
-            login(request, user)
-            return redirect('collection')
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
+            user = form.save(commit=False)  # Don't save yet
+            user.username = user.email  # Set the username to be the email
+            login(request, user.id) #cheeck!!!
+            user.save()  # Save the user with email as username
+            return redirect('collection')  # Redirect to login page after successful signup
+        else:
+            # If form is not valid, return with form errors
+            template_data['form'] = form
+            return render(request, 'registration/signup.html', {'template_data': template_data})
+
+    elif request.method == 'GET':
+        template_data['form'] = CustomUserCreationForm()
+        return render(request, 'registration/signup.html', {'template_data': template_data})
+
+
 
 @login_required
 def purchase_pokemon_view(request, pokemon_id):
