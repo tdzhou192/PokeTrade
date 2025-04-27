@@ -28,6 +28,7 @@
     </form>
     <img id="owned_pokemon_image" src="" alt="Selected Pokémon" style="width:100px; display:block; margin-top:10px;">
     <script>
+    
     document.getElementById('owned_pokemon_id').addEventListener('change', function(){
         var selectedOption = this.options[this.selectedIndex];
         var spriteUrl = selectedOption.getAttribute('data-sprite');
@@ -41,6 +42,12 @@
         }
     };
     </script>
+    <hr>
+    <h2>Purchase this Pokémon</h2>
+    <form method="post" action="{% url 'purchase_pokemon' pokemon.id %}">
+      {% csrf_token %}
+      <button type="submit">Purchase for 1000 Poke Coins</button>
+    </form>
     {% else %}
     <h1>Error Loading Pokémon</h1>
     <p>{{ error }}</p>

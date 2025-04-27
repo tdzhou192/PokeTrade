@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ pokemon.name|capfirst }} Details</title>
+  </head>
+  <body>
+    {% if pokemon %}
+      <h1>{{ pokemon.name|capfirst }}</h1>
+      <img src="{{ sprite_url }}" alt="{{ pokemon.name }}" style="width:100px;">
+      <p>Height: {{ pokemon.height }}</p>
+      <p>Weight: {{ pokemon.weight }}</p>
+      <p>
+        Type: 
+        {% if pokemon.types %}
+          {% for type in pokemon.types %}
+             {{ type.type.name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          unknown
+        {% endif %}
+      </p>
+      <p>Date Received: {{ user_pokemon.date_received }}</p>
+
+      {% if not user_pokemon.is_listed %}
+        <h3>List this Pokémon for Sale/Trade</h3>
+        <form method="post" action="{% url 'list_pokemon_for_sale' user_pokemon.id %}">
+          {% csrf_token %}
+          <label for="price">Set your price (in Poke Coins):</label>
+          <input type="number" name="price" id="price" min="1" required>
+          <button type="submit">List for Sale</button>
+        </form>
+      {% else %}
+        <p>This Pokémon is listed for sale at <strong>{{ user_pokemon.price }}</strong> Poke Coins.</p>
+      {% endif %}
+    {% else %}
+      <h1>Error Loading Pokémon</h1>
+      <p>{{ error }}</p>
+    {% endif %}
+    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
+  </body>
+</html>

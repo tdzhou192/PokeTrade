@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ pokemon.name|capfirst }} - For Sale</title>
+  </head>
+  <body>
+    {% if pokemon %}
+      <h1>{{ pokemon.name|capfirst }} (For Sale)</h1>
+      <img src="{{ sprite_url }}" alt="{{ pokemon.name }}" style="width:100px;">
+      <p>Height: {{ pokemon.height }}</p>
+      <p>Weight: {{ pokemon.weight }}</p>
+      <p>
+        Type: 
+        {% if pokemon.types %}
+          {% for type in pokemon.types %}
+             {{ type.type.name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          unknown
+        {% endif %}
+      </p>
+      <p>Price: {{ listing.price }} Poke Coins</p>
+      <p>Seller: {{ listing.owner.username }}</p>
+      
+      <!-- Purchase option -->
+      <h3>Purchase</h3>
+      <form method="post" action="{% url 'purchase_listed_pokemon' listing.id %}">
+        {% csrf_token %}
+        <button type="submit">Purchase for {{ listing.price }} Coins</button>
+      </form>
+
+      <!-- Trade option -->
+      <h3>Trade</h3>
+      <form method="post" action="{% url 'trade_for_listed_pokemon' listing.id %}">
+        {% csrf_token %}
+        <label for="owned_pokemon_id">Select one of your Pokémon to trade:</label>
+        <select name="owned_pokemon_id" id="owned_pokemon_id">
+          {% for owned in owned_pokemon_list %}
+            <option value="{{ owned.id }}">{{ owned.name }} ({{ owned.type }})</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Trade</button>
+      </form>
+    {% else %}
+      <h1>Error Loading Listing</h1>
+      <p>{{ error }}</p>
+    {% endif %}
+    <p><a href="{% url 'marketplace' %}">Back to Marketplace</a></p>
+  </body>
+</html>
