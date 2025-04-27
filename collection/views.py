@@ -68,25 +68,6 @@ def marketplace_view(request):
 # ... existing code above remains unchanged ...
 
 @login_required
-def pokemon_detail_view(request, pokemon_id):
-    import pokebase as pb
-    from .models import Pokemon
-    try:
-        # Fetch marketplace Pokémon data from PokeAPI
-        pokemon = pb.pokemon(pokemon_id)
-        sprite = pb.SpriteResource('pokemon', pokemon_id, other=True, official_artwork=True)
-    except Exception as e:
-        return render(request, 'pokemon_detail.html', {'error': str(e), 'pokemon': None})
-    # Also fetch your owned Pokémon in random order for potential trade
-    owned_pokemon_list = Pokemon.objects.filter(owner=request.user).order_by('?')
-    context = {
-        'pokemon': pokemon,
-        'sprite_url': sprite.url,
-        'owned_pokemon_list': owned_pokemon_list,
-    }
-    return render(request, 'pokemon_detail.html', context)
-
-@login_required
 def trade_pokemon_view(request, marketplace_id):
     import pokebase as pb
     from .models import Pokemon
