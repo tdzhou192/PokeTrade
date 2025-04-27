@@ -185,8 +185,8 @@ def signup(request):
             return render(request, 'registration/signup.html', {'template_data': template_data})
 
     elif request.method == 'GET':
-        template_data['form'] = CustomUserCreationForm()
-        return render(request, 'registration/signup.html', {'template_data': template_data})
+        form = CustomUserCreationForm()
+        return render(request, 'registration/signup.html', {'form': form})
 
 
 
