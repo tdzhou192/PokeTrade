@@ -143,7 +143,7 @@ def signup(request):
             return redirect('collection')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/templates/signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
 
 @login_required
 def purchase_pokemon_view(request, pokemon_id):
