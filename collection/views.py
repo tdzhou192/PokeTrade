@@ -21,6 +21,8 @@ def collection_view(request):
         pokemons = pokemons.order_by('type')
     elif sort_by == 'date':
         pokemons = pokemons.order_by('date_received')
+    elif sort_by == 'favorite':
+        pokemons = pokemons.order_by('-is_favorite', 'name')
 
     return render(request, 'collection.html', {
         'pokemons': pokemons,
