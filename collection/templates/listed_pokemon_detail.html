@@ -31,17 +31,17 @@
       </form>
 
       <!-- Trade option -->
-      <h3>Trade</h3>
-      <form method="post" action="{% url 'trade_for_listed_pokemon' listing.id %}">
+      <h3>Send Trade Offer</h3>
+        <form method="post" action="{% url 'send_trade_offer' listing.id %}">
         {% csrf_token %}
-        <label for="owned_pokemon_id">Select one of your Pokémon to trade:</label>
+        <label for="owned_pokemon_id">Select one of your Pokémon to offer:</label>
         <select name="owned_pokemon_id" id="owned_pokemon_id">
-          {% for owned in owned_pokemon_list %}
+            {% for owned in owned_pokemon_list %}
             <option value="{{ owned.id }}">{{ owned.name }} ({{ owned.type }})</option>
-          {% endfor %}
+            {% endfor %}
         </select>
-        <button type="submit">Trade</button>
-      </form>
+        <button type="submit">Send Trade Offer</button>
+        </form>
     {% else %}
       <h1>Error Loading Listing</h1>
       <p>{{ error }}</p>

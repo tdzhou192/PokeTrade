@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Your Trade Offers</title>
+  </head>
+  <body>
+    <h1>Your Trade Offers</h1>
+    <ul>
+      {% for offer in offers %}
+      <li>
+         <p>You offered your Pokémon <em>{{ offer.offered_pokemon.name }}</em> for <strong>{{ offer.listing.name }}</strong> (Seller: {{ offer.seller.username }}).</p>
+         <p>Status: {{ offer.get_status_display }}</p>
+      </li>
+      {% empty %}
+         <li>You have no pending trade offers.</li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
+  </body>
+</html>

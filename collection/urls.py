@@ -19,4 +19,9 @@ urlpatterns = [
     path('purchase_listed/<int:pokemon_id>/', views.purchase_listed_pokemon_view, name='purchase_listed_pokemon'),
     path('trade_listed/<int:pokemon_id>/', views.trade_for_listed_pokemon_view, name='trade_for_listed_pokemon'),
     path('list/<int:pokemon_id>/', views.list_pokemon_for_sale_view, name='list_pokemon_for_sale'),
+    path('send_trade_offer/<int:listing_id>/', views.send_trade_offer_view, name='send_trade_offer'),
+    path('incoming_trade_offers/', views.incoming_trade_offers_view, name='incoming_trade_offers'),
+    path('outgoing_trade_offers/', views.outgoing_trade_offers_view, name='outgoing_trade_offers'),
+    path('accept_trade_offer/<int:offer_id>/', views.accept_trade_offer_view, name='accept_trade_offer'),
+    path('decline_trade_offer/<int:offer_id>/', views.decline_trade_offer_view, name='decline_trade_offer'),
 ]

@@ -33,3 +33,27 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+class TradeOffer(models.Model):
+    seller = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='incoming_trade_offers'
+    )
+    buyer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='outgoing_trade_offers'
+    )
+    listing = models.ForeignKey(
+        Pokemon, on_delete=models.CASCADE, related_name='trade_offers'
+    )
+    offered_pokemon = models.ForeignKey(
+        Pokemon, on_delete=models.CASCADE, related_name='offered_in_trade'
+    )
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('denied', 'Denied'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"TradeOffer from {self.buyer.username} for {self.listing.name} ({self.status})"

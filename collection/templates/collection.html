@@ -49,3 +49,9 @@
     <button type="submit">Add Random Pokémon to My Collection</button>
 </form>
 {% endif %}
+
+<p>
+    <a href="{% url 'incoming_trade_offers' %}">Incoming Trade Offers</a> |
+    <a href="{% url 'outgoing_trade_offers' %}">Outgoing Trade Offers</a> |
+    <a href="{% url 'marketplace' %}">Marketplace</a>
+</p>
