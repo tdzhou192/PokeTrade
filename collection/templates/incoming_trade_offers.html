@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Incoming Trade Offers</title>
+  </head>
+  <body>
+    <h1>Incoming Trade Offers</h1>
+    <ul>
+      {% for offer in offers %}
+      <li>
+         <p><strong>{{ offer.buyer.username }}</strong> offers their Pokémon <em>{{ offer.offered_pokemon.name }}</em> for your listed Pokémon <em>{{ offer.listing.name }}</em>.</p>
+         <p>
+             <a href="{% url 'accept_trade_offer' offer.id %}">Accept</a> |
+             <a href="{% url 'decline_trade_offer' offer.id %}">Decline</a>
+         </p>
+      </li>
+      {% empty %}
+         <li>No pending trade offers.</li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'collection' %}">Back to Collection</a></p>
+  </body>
+</html>

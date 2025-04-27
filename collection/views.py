@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm   # added import
 from django.contrib.auth import login  
 from .models import Pokemon
+from .models import TradeOffer
 
 @login_required
 def collection_view(request):
@@ -304,3 +305,78 @@ def trade_for_listed_pokemon_view(request, pokemon_id):
         offered_pokemon.owner = seller
         offered_pokemon.save()
     return redirect('collection')
+
+@login_required
+def send_trade_offer_view(request, listing_id):
+    """
+    Buyer sends a trade offer for a listed Pokémon.
+    Expects POST data with 'owned_pokemon_id' representing the buyer's offered Pokémon.
+    """
+    from django.shortcuts import get_object_or_404
+    if request.method == "POST":
+        offered_pokemon_id = request.POST.get("owned_pokemon_id")
+        listing = get_object_or_404(Pokemon, id=listing_id, is_listed=True)
+        # Ensure buyer is not the seller
+        if listing.owner == request.user:
+            return redirect('owned_pokemon_detail', pokemon_id=listing_id)
+        offered_pokemon = get_object_or_404(Pokemon, id=offered_pokemon_id, owner=request.user)
+        TradeOffer.objects.create(
+            seller=listing.owner,
+            buyer=request.user,
+            listing=listing,
+            offered_pokemon=offered_pokemon,
+            status='pending'
+        )
+        return redirect('outgoing_trade_offers')
+    else:
+        return redirect('listed_pokemon_detail', pokemon_id=listing_id)
+
+@login_required
+def incoming_trade_offers_view(request):
+    """
+    Displays a list of pending trade offers for the current seller.
+    """
+    offers = TradeOffer.objects.filter(seller=request.user, status='pending')
+    return render(request, 'incoming_trade_offers.html', {'offers': offers})
+
+@login_required
+def outgoing_trade_offers_view(request):
+    """
+    Displays a list of pending trade offers sent by the current user.
+    """
+    offers = TradeOffer.objects.filter(buyer=request.user, status='pending')
+    return render(request, 'outgoing_trade_offers.html', {'offers': offers})
+
+@login_required
+def accept_trade_offer_view(request, offer_id):
+    """
+    Seller accepts a trade offer.
+    This transfers the listed Pokémon to the buyer and the offered Pokémon to the seller, then marks the offer as accepted.
+    """
+    from django.shortcuts import get_object_or_404
+    offer = get_object_or_404(TradeOffer, id=offer_id, seller=request.user, status='pending')
+    # Transfer ownership:
+    listing = offer.listing
+    offered = offer.offered_pokemon
+    seller = offer.seller
+    buyer = offer.buyer
+    listing.owner = buyer
+    listing.is_listed = False
+    listing.price = None
+    listing.save()
+    offered.owner = seller
+    offered.save()
+    offer.status = 'accepted'
+    offer.save()
+    return redirect('incoming_trade_offers')
+
+@login_required
+def decline_trade_offer_view(request, offer_id):
+    """
+    Seller declines a trade offer.
+    """
+    from django.shortcuts import get_object_or_404
+    offer = get_object_or_404(TradeOffer, id=offer_id, seller=request.user, status='pending')
+    offer.status = 'denied'
+    offer.save()
+    return redirect('incoming_trade_offers')
