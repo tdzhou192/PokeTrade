@@ -54,6 +54,10 @@
        .nav-links a.login-link {
            color: #0075BE;
        }
+       .nav-links a.admin-link {
+           color: #EE2626;
+           font-weight: 700;
+       }
        .nav-links a:hover {
            text-decoration: underline;
        }
@@ -79,6 +83,9 @@
            <a href="{% url 'about' %}" class="about-link">About</a>
            <a href="{% url 'collection' %}" class="collection-link">Collection</a>
            <a href="{% url 'marketplace' %}" class="marketplace-link">Marketplace</a>
+           {% if user.is_authenticated and user.is_staff %}
+           <a href="/admin" class="admin-link">Admin Features</a>
+           {% endif %}
    </div>
 </nav>
 
