@@ -1,14 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm   # added import
-from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
+from django.forms.utils import ErrorList
 
 from .forms import CustomUserCreationForm, CustomErrorList
-from .models import Pokemon
-from .models import TradeOffer
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
-from django.forms.utils import ErrorList
+from .models import Pokemon, TradeOffer
 
 User = get_user_model()
 
@@ -21,7 +18,7 @@ def about(request):
     return render(request, 'about.html')
 
 @login_required
-def login(request):
+def login_view(request):
     template_data = {}
     template_data['title'] = 'Login'
 
@@ -32,14 +29,14 @@ def login(request):
         email = request.POST['username']  # Treat 'username' as email input
         password = request.POST['password']
 
-        # Authenticate using email (by default Django uses 'username')
         user = authenticate(request, username=email, password=password)
 
-        if user is None:
+        if user is not None:
+            login(request, user)  # <--- Correct usage of Django login!
+            return redirect('collection')  # Redirect to homepage
+        else:
             template_data['error'] = 'The email or password is incorrect.'
             return render(request, 'registration/login.html', {'template_data': template_data})
-        elif request.user.is_authenticated:
-            return redirect('registration/login.html')  # Redirect to home page after login
 
 def collection_view(request):
     search_query = request.GET.get('search', '')
@@ -169,32 +166,20 @@ def populate_collection(request):
          return redirect('collection')
     
 def signup(request):
-    template_data = {}
     if request.method == 'POST':
-        form = UserCreationForm(request.POST, error_class=CustomErrorList)
-        email = request.POST.get('email')
-
-        if User.objects.filter(email=email).exists():
-            # If email exists, add an error and re-render the form
-            template_data['form'] = form
-            template_data['error'] = 'This email is already registered.'
-
-            return render(request, 'registration/signup.html', {'form': form})
-
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)  # Don't save yet
-            user.username = user.email  # Set the username to be the email
-            login(request, user.id) #cheeck!!!
-            user.save()  # Save the user with email as username
-            return redirect('collection')  # Redirect to login page after successful signup
+            user = form.save(commit=False)
+            user.email = form.cleaned_data['email']
+            user.save()
+            login(request, user)  # Correct usage
+            return redirect('collection')
         else:
-            # If form is not valid, return with form errors
-            template_data['form'] = form
-            return render(request, 'registration/signup.html', {'template_data': template_data})
-
-    elif request.method == 'GET':
+            return render(request, 'registration/signup.html', {'form': form})
+    else:
         form = CustomUserCreationForm()
         return render(request, 'registration/signup.html', {'form': form})
+
 
 
 

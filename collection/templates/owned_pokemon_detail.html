@@ -1,171 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ pokemon.name|capfirst }} Details - PokéTrade</title>
-    <style>
-        body {
-            font-family: 'Poppins', Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .pokemon-detail-container {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
-            width: 400px;
-            text-align: center;
-        }
-        h1 {
-            color: #ff3c00;
-            margin-bottom: 20px;
-            font-size: 32px;
-        }
-        .pokemon-img {
-            width: 150px;
-            height: auto;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-        .pokemon-img:hover {
-            transform: scale(1.1) rotate(3deg);
-        }
-        .pokemon-info p {
-            font-size: 16px;
-            margin: 8px 0;
-        }
-        .form-section {
-            margin-top: 30px;
-        }
-        .form-section form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .form-section input[type="number"] {
-            padding: 8px;
-            width: 100%;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .form-section button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-section button:hover {
-            background-color: #45a049;
-        }
-        .back-link {
-            margin-top: 20px;
-            display: block;
-            color: #2196F3;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
+{% extends 'base.html' %}
+{% load static %}
 
-        /* Type badges */
-        .type-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background-color: #eee;
-            font-size: 14px;
-            margin: 5px 2px;
-            color: white;
-        }
-        .type-fire { background-color: #f08030; }
-        .type-water { background-color: #6890f0; }
-        .type-grass { background-color: #78c850; }
-        .type-electric { background-color: #f8d030; color: black; }
-        .type-ice { background-color: #98d8d8; color: black; }
-        .type-psychic { background-color: #f85888; }
-        .type-fighting { background-color: #c03028; }
-        .type-poison { background-color: #a040a0; }
-        .type-ground { background-color: #e0c068; color: black; }
-        .type-flying { background-color: #a890f0; }
-        .type-bug { background-color: #a8b820; color: black; }
-        .type-rock { background-color: #b8a038; color: black; }
-        .type-ghost { background-color: #705898; }
-        .type-dragon { background-color: #7038f8; }
-        .type-dark { background-color: #705848; }
-        .type-steel { background-color: #b8b8d0; }
-        .type-fairy { background-color: #ee99ac; }
-        .type-normal { background-color: #a8a878; color: black; }
+{% block title %}{{ pokemon.name|capfirst }} - PokéTrade{% endblock %}
 
-        /* On Sale badge */
-        .on-sale-badge {
-            background: gold;
-            color: black;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<style>
+    body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background-color: #f2f3f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pokemon-detail-container {
+        display: flex;
+        align-items: center; /* center vertically */
+        justify-content: center;
+        padding: 50px 20px;
+        gap: 60px;
+    }
+
+    .pokemon-image-section {
+        text-align: center;
+    }
+
+    .pokemon-img {
+        width: 250px;
+        height: auto;
+    }
+
+    .pokemon-info-section {
+        max-width: 450px;
+    }
+
+    .pokemon-name {
+        font-size: 60px;
+        font-weight: 900;
+        color: #EE2626;
+        margin: 0 0 20px 0;
+    }
+
+    .stats-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #0075BE;
+        margin-bottom: 20px;
+    }
+
+    .stat-line {
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .type-badges {
+        margin-top: 10px;
+    }
+
+    .type-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin: 5px 5px 0 0;
+        color: white;
+        text-transform: capitalize;
+    }
+
+    .type-fire { background-color: #f08030; }
+    .type-water { background-color: #6890f0; }
+    .type-grass { background-color: #78c850; }
+    .type-electric { background-color: #f8d030; color: black; }
+    .type-ice { background-color: #98d8d8; color: black; }
+    .type-psychic { background-color: #f85888; }
+    .type-fighting { background-color: #c03028; }
+    .type-poison { background-color: #a040a0; }
+    .type-ground { background-color: #e0c068; color: black; }
+    .type-flying { background-color: #a890f0; }
+    .type-bug { background-color: #a8b820; color: black; }
+    .type-rock { background-color: #b8a038; color: black; }
+    .type-ghost { background-color: #705898; }
+    .type-dragon { background-color: #7038f8; }
+    .type-dark { background-color: #705848; }
+    .type-steel { background-color: #b8b8d0; }
+    .type-fairy { background-color: #ee99ac; }
+    .type-normal { background-color: #a8a878; color: black; }
+
+    .form-section {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-section input[type="number"] {
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .form-section button {
+        padding: 15px;
+        background-color: #0075BE;
+        border: none;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 25px;
+        cursor: pointer;
+        box-shadow: 0px 10px 30px rgba(0, 117, 190, 0.5);
+        transition: background-color 0.3s;
+    }
+
+    .form-section button:hover {
+        background: linear-gradient(135deg, #2575fc, #6a11cb);
+    }
+
+    .back-link {
+        margin-top: 30px;
+        display: block;
+        text-align: center;
+        font-size: 18px;
+        color: #0075BE;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
 
 <div class="pokemon-detail-container">
-    {% if pokemon %}
-        <h1>
-            {{ pokemon.name|capfirst }}
-            {% if user_pokemon.is_listed %}
-                <span class="on-sale-badge">On Sale</span>
-            {% endif %}
-        </h1>
-
+    <div class="pokemon-image-section">
         <img src="{{ sprite_url }}" alt="{{ pokemon.name }}" class="pokemon-img">
+    </div>
 
-        <div class="pokemon-info">
-            <p><strong>Height:</strong> {{ pokemon.height }}</p>
-            <p><strong>Weight:</strong> {{ pokemon.weight }}</p>
+    <div class="pokemon-info-section">
+        <h1 class="pokemon-name">{{ pokemon.name|capfirst }}</h1>
 
-            <p><strong>Type:</strong><br>
+        <div class="stats-title">Stats.</div>
+
+        <div class="stat-line"><strong>Height:</strong> {{ pokemon.height }}</div>
+        <div class="stat-line"><strong>Weight:</strong> {{ pokemon.weight }}</div>
+        <div class="stat-line">
+            <strong>Type(s):</strong>
+            <div class="type-badges">
                 {% if pokemon.types %}
                     {% for type in pokemon.types %}
-                        <span class="type-badge type-{{ type.type.name }}">{{ type.type.name|capfirst }}</span>
+                        <span class="type-badge type-{{ type.type.name }}">{{ type.type.name }}</span>
                     {% endfor %}
                 {% else %}
                     Unknown
                 {% endif %}
-            </p>
-
-            <p><strong>Date Received:</strong> {{ user_pokemon.date_received }}</p>
+            </div>
         </div>
+        <div class="stat-line"><strong>Date Received:</strong> {{ user_pokemon.date_received|date:"M d, Y" }}</div>
 
         {% if not user_pokemon.is_listed %}
-            <div class="form-section">
-                <h3>List this Pokémon for Sale/Trade</h3>
-                <form method="post" action="{% url 'list_pokemon_for_sale' user_pokemon.id %}">
-                    {% csrf_token %}
-                    <input type="number" name="price" id="price" min="1" placeholder="Set price in PokeCoins" required>
-                    <button type="submit">List for Sale</button>
-                </form>
-            </div>
+        <div class="form-section">
+            <form method="post" action="{% url 'list_pokemon_for_sale' user_pokemon.id %}">
+                {% csrf_token %}
+                <input type="number" name="price" id="price" min="1" placeholder="Set price in PokéCoins" required>
+                <button type="submit">List Price</button>
+            </form>
+        </div>
         {% else %}
-            <p><strong>This Pokémon is listed</strong> for sale at <strong>{{ user_pokemon.price }}</strong> PokeCoins.</p>
+        <p><strong>This Pokémon is listed</strong> for {{ user_pokemon.price }} PokéCoins.</p>
         {% endif %}
-    {% else %}
-        <h1>Error Loading Pokémon</h1>
-        <p>{{ error }}</p>
-    {% endif %}
-
-    <a href="{% url 'collection' %}" class="back-link">← Back to Collection</a>
+    </div>
 </div>
 
-</body>
-</html>
+<a href="{% url 'collection' %}" class="back-link">← Back to Collection</a>
+
+{% endblock %}
