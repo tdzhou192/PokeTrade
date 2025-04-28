@@ -26,14 +26,14 @@ def login_view(request):
         return render(request, 'registration/login.html', {'template_data': template_data})
 
     elif request.method == 'POST':
-        email = request.POST['username']  # Treat 'username' as email input
+        email = request.POST['username']
         password = request.POST['password']
 
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            login(request, user)  # <--- Correct usage of Django login!
-            return redirect('collection')  # Redirect to homepage
+            login(request, user)
+            return redirect('collection')
         else:
             template_data['error'] = 'The email or password is incorrect.'
             return render(request, 'registration/login.html', {'template_data': template_data})
@@ -88,7 +88,6 @@ def marketplace_view(request):
         except Exception as e:
             continue
     coins = request.user.profile.coins
-    # Filter listings by Pokémon name if a search query is provided, otherwise show all listings
     if search_query:
         listings = Pokemon.objects.filter(is_listed=True, name__icontains=search_query)
     else:
@@ -99,7 +98,6 @@ def marketplace_view(request):
         'listings': listings,
         'search_query': search_query,
     })
-# ... existing code above remains unchanged ...
 
 @login_required
 def trade_pokemon_view(request, marketplace_id):
@@ -108,14 +106,11 @@ def trade_pokemon_view(request, marketplace_id):
     if request.method == "POST":
         owned_pokemon_id = request.POST.get("owned_pokemon_id")
         try:
-            # Get the Pokémon you own to trade away
             owned_pokemon = Pokemon.objects.get(id=owned_pokemon_id, owner=request.user)
         except Pokemon.DoesNotExist:
             return redirect('collection')
         try:
-            # Fetch the marketplace Pokémon data using PokeAPI
             marketplace_pokemon = pb.pokemon(marketplace_id)
-            # Get the type from the marketplace Pokémon; take the first type if present.
             if marketplace_pokemon.types:
                 marketplace_type = marketplace_pokemon.types[0].type.name
             else:
@@ -123,13 +118,11 @@ def trade_pokemon_view(request, marketplace_id):
         except Exception as e:
             return redirect('collection')
 
-        # Perform the trade: update your owned Pokémon record with marketplace Pokémon details.
         owned_pokemon.name = marketplace_pokemon.name
         owned_pokemon.type = marketplace_type
-        owned_pokemon.poke_id = marketplace_id  # <-- update the poke_id to reflect the new Pokémon
+        owned_pokemon.poke_id = marketplace_id
         owned_pokemon.save()
 
-        # Redirect to your collection view after the trade
         return redirect('collection')
     else:
         return redirect('collection')
@@ -142,27 +135,21 @@ def populate_collection(request):
     import random
     from .models import Pokemon
     if request.method == "POST":
-         # Add 5 random Pokémon to the user's collection.
          for i in range(5):
               random_id = random.randint(1, 151)
               try:
                   p = pb.pokemon(random_id)
-                  # Use the first type if available.
                   pokemon_type = p.types[0].type.name if p.types else "unknown"
-                  # Create a new Pokémon record.
                   Pokemon.objects.create(
                        owner=request.user,
                        name=p.name,
                        type=pokemon_type,
-                       poke_id=random_id,  # store the PokeAPI id so we can build the image URL later
+                       poke_id=random_id,
                   )
               except Exception as e:
-                  # If an error occurs (e.g. API error), skip this one.
                   continue
-         # Redirect back to your collection view.
          return redirect('collection')
     else:
-         # For non-POST requests, simply redirect back.
          return redirect('collection')
     
 def signup(request):
@@ -187,20 +174,15 @@ def signup(request):
 def purchase_pokemon_view(request, pokemon_id):
     import pokebase as pb
     if request.method == "POST":
-        # Check if the user has enough coins (cost: 1000)
         if request.user.profile.coins < 1000:
-            # Optionally, you could add an error message here
             return redirect('marketplace')
-        # Deduct cost and update profile
         request.user.profile.coins -= 1000
         request.user.profile.save()
         try:
             p = pb.pokemon(pokemon_id)
         except Exception as e:
             return redirect('marketplace')
-        # Use the first type if available, otherwise "unknown"
         pokemon_type = p.types[0].type.name if p.types else "unknown"
-        # Create a new Pokemon record in the user's collection
         Pokemon.objects.create(
             owner=request.user,
             name=p.name,
@@ -214,11 +196,9 @@ def purchase_pokemon_view(request, pokemon_id):
 @login_required
 def owned_pokemon_detail_view(request, pokemon_id):
     import pokebase as pb
-    # Ensure the Pokémon belongs to the current user
     from django.shortcuts import get_object_or_404
     owned_pokemon = get_object_or_404(Pokemon, id=pokemon_id, owner=request.user)
     try:
-        # Fetch full details from the API based on the poke_id stored in your model
         p = pb.pokemon(owned_pokemon.poke_id)
         sprite = pb.SpriteResource('pokemon', owned_pokemon.poke_id, other=True, official_artwork=True)
     except Exception as e:
@@ -226,7 +206,7 @@ def owned_pokemon_detail_view(request, pokemon_id):
     context = {
         'pokemon': p,
         'sprite_url': sprite.url,
-        'user_pokemon': owned_pokemon,  # includes extra info like date_received
+        'user_pokemon': owned_pokemon,
     }
     return render(request, 'owned_pokemon_detail.html', context)
 
@@ -240,7 +220,6 @@ def list_pokemon_for_sale_view(request, pokemon_id):
             if price <= 0:
                 raise ValueError
         except (ValueError, TypeError):
-            # If invalid, redirect back to the detail view
             return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
         pokemon = get_object_or_404(Pokemon, id=pokemon_id, owner=request.user)
         pokemon.is_listed = True
@@ -250,30 +229,22 @@ def list_pokemon_for_sale_view(request, pokemon_id):
 
 @login_required
 def listed_pokemon_detail_view(request, pokemon_id):
-    """
-    Display details for a Pokémon that is listed for sale/trade.
-    If the current user is the seller, they can view their own details via owned_pokemon_detail_view.
-    """
     import pokebase as pb
     from django.shortcuts import get_object_or_404
-    # Get the listed Pokémon; only allow listings
     listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
     if listing.owner == request.user:
-        # Redirect sellers to their personal detail view
         return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
     try:
-        # Use the poke_id stored to fetch details from the API.
         p = pb.pokemon(listing.poke_id)
         sprite = pb.SpriteResource('pokemon', listing.poke_id, other=True, official_artwork=True)
     except Exception as e:
         return render(request, 'listed_pokemon_detail.html', {'error': str(e), 'pokemon': None})
-    # Get the buyer's owned Pokémon in case they want to trade.
     owned_pokemon_list = Pokemon.objects.filter(owner=request.user)
     context = {
-        'listing': listing,      # the listed Pokemon (seller, price, etc.)
-        'pokemon': p,            # API data for the listed Pokemon
+        'listing': listing,
+        'pokemon': p,
         'sprite_url': sprite.url,
-        'owned_pokemon_list': owned_pokemon_list,  # for trade option
+        'owned_pokemon_list': owned_pokemon_list,
     }
     return render(request, 'listed_pokemon_detail.html', context)
 
@@ -283,32 +254,25 @@ from django.urls import reverse
 @login_required
 def purchase_listed_pokemon_view(request, pokemon_id):
     from django.shortcuts import get_object_or_404
-    from .models import Purchase  # import the Purchase model
+    from .models import Purchase
     if request.method == "POST":
         listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
-        # Prevent sellers from purchasing their own listings
         if listing.owner == request.user:
             return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
         price = listing.price
         buyer_profile = request.user.profile
         seller_profile = listing.owner.profile
-        # Check if buyer has enough coins
         if buyer_profile.coins < price:
-            # Redirect back with a GET parameter so the template can display a message
             return redirect(reverse('listed_pokemon_detail', args=[pokemon_id]) + "?insufficient_funds=1")
-        # Deduct price from buyer and credit seller
         buyer_profile.coins -= price
         buyer_profile.save()
         seller_profile.coins += price
         seller_profile.save()
-        # Capture the seller before transferring ownership
         prev_seller = listing.owner
-        # Transfer ownership and unlist the Pokémon
         listing.owner = request.user
         listing.is_listed = False
         listing.price = None
         listing.save()
-        # Optionally create a Purchase record reflecting this transaction
         Purchase.objects.create(
             buyer=request.user,
             seller=prev_seller,
@@ -319,42 +283,28 @@ def purchase_listed_pokemon_view(request, pokemon_id):
 
 @login_required
 def trade_for_listed_pokemon_view(request, pokemon_id):
-    """
-    Handle trading for a listed Pokémon.
-    The buyer selects one of their own Pokémon for swapping.
-    That Pokémon is transferred to the seller and the listed Pokémon is given to the buyer.
-    """
     from django.shortcuts import get_object_or_404
     if request.method == "POST":
         offered_id = request.POST.get("owned_pokemon_id")
         listing = get_object_or_404(Pokemon, id=pokemon_id, is_listed=True)
-        # Buyer cannot trade for their own listing.
         if listing.owner == request.user:
             return redirect('owned_pokemon_detail', pokemon_id=pokemon_id)
         offered_pokemon = get_object_or_404(Pokemon, id=offered_id, owner=request.user)
         seller = listing.owner
-        # Swap the owners:
         listing.owner = request.user
-        # Optionally, you might want to unlist the listing:
         listing.is_listed = False
         listing.price = None
         listing.save()
-        # Give the offered Pokémon to the seller
         offered_pokemon.owner = seller
         offered_pokemon.save()
     return redirect('collection')
 
 @login_required
 def send_trade_offer_view(request, listing_id):
-    """
-    Buyer sends a trade offer for a listed Pokémon.
-    Expects POST data with 'owned_pokemon_id' representing the buyer's offered Pokémon.
-    """
     from django.shortcuts import get_object_or_404
     if request.method == "POST":
         offered_pokemon_id = request.POST.get("owned_pokemon_id")
         listing = get_object_or_404(Pokemon, id=listing_id, is_listed=True)
-        # Ensure buyer is not the seller
         if listing.owner == request.user:
             return redirect('owned_pokemon_detail', pokemon_id=listing_id)
         offered_pokemon = get_object_or_404(Pokemon, id=offered_pokemon_id, owner=request.user)
@@ -371,29 +321,18 @@ def send_trade_offer_view(request, listing_id):
 
 @login_required
 def incoming_trade_offers_view(request):
-    """
-    Displays a list of pending trade offers for the current seller.
-    """
     offers = TradeOffer.objects.filter(seller=request.user, status='pending')
     return render(request, 'incoming_trade_offers.html', {'offers': offers})
 
 @login_required
 def outgoing_trade_offers_view(request):
-    """
-    Displays a list of pending trade offers sent by the current user.
-    """
     offers = TradeOffer.objects.filter(buyer=request.user, status='pending')
     return render(request, 'outgoing_trade_offers.html', {'offers': offers})
 
 @login_required
 def accept_trade_offer_view(request, offer_id):
-    """
-    Seller accepts a trade offer.
-    This transfers the listed Pokémon to the buyer and the offered Pokémon to the seller, then marks the offer as accepted.
-    """
     from django.shortcuts import get_object_or_404
     offer = get_object_or_404(TradeOffer, id=offer_id, seller=request.user, status='pending')
-    # Transfer ownership:
     listing = offer.listing
     offered = offer.offered_pokemon
     seller = offer.seller
@@ -410,9 +349,6 @@ def accept_trade_offer_view(request, offer_id):
 
 @login_required
 def decline_trade_offer_view(request, offer_id):
-    """
-    Seller declines a trade offer.
-    """
     from django.shortcuts import get_object_or_404
     offer = get_object_or_404(TradeOffer, id=offer_id, seller=request.user, status='pending')
     offer.status = 'denied'
@@ -422,13 +358,11 @@ def decline_trade_offer_view(request, offer_id):
 @login_required
 def trade_history_view(request):
     from django.db.models import Q
-    from .models import Purchase  # ensure Purchase is imported
-    # Get accepted trade offers involving the current user
+    from .models import Purchase
     trade_offers = TradeOffer.objects.filter(
         Q(buyer=request.user) | Q(seller=request.user),
         status='accepted'
     )
-    # Get purchase transactions where the current user is either buyer or seller
     purchases = Purchase.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
     history = []
     for t in trade_offers:
@@ -438,7 +372,6 @@ def trade_history_view(request):
             'data': t,
         })
     for p in purchases:
-        # Determine event type based on user role
         event_type = 'purchase' if p.buyer == request.user else 'sale'
         history.append({
             'type': event_type,
@@ -451,12 +384,10 @@ def trade_history_view(request):
 @login_required
 def purchase_pokemon_view(request, pokemon_id):
     import pokebase as pb
-    from .models import Purchase  # import the Purchase model
+    from .models import Purchase
     if request.method == "POST":
-        # Check if the user has enough coins (cost: 1000)
         if request.user.profile.coins < 1000:
             return redirect('marketplace')
-        # Deduct cost and update profile
         request.user.profile.coins -= 1000
         request.user.profile.save()
         try:
@@ -464,14 +395,12 @@ def purchase_pokemon_view(request, pokemon_id):
         except Exception as e:
             return redirect('marketplace')
         pokemon_type = p.types[0].type.name if p.types else "unknown"
-        # Create the new Pokemon in the user's collection and store it in a variable
         new_pokemon = Pokemon.objects.create(
             owner=request.user,
             name=p.name,
             type=pokemon_type,
             poke_id=pokemon_id,
         )
-        # Create a Purchase record (seller is None for system purchases)
         Purchase.objects.create(
             buyer=request.user,
             seller=None,
@@ -485,4 +414,4 @@ def purchase_pokemon_view(request, pokemon_id):
 
 
 def about_view(request):
-    return render(request, 'registration/about.html')
+    return render(request, 'about.html')

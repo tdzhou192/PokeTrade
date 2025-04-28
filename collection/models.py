@@ -21,7 +21,6 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s profile"
 
-# Add signals to automatically create a Profile when a new user is created:
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 

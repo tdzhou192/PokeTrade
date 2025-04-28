@@ -133,7 +133,6 @@
          </ul>
        </div>
 
-       <!-- Email -->
        <div class="input-group">
          <label for="id_email">Email</label>
          <input type="email" name="email" id="id_email" placeholder="Enter your email" value="{{ form.email.value|default_if_none:'' }}">
@@ -144,7 +143,6 @@
          {% endif %}
        </div>
 
-       <!-- Username -->
        <div class="input-group">
          <label for="id_username">Username</label>
          <input type="text" name="username" id="id_username" placeholder="Enter your username" value="{{ form.username.value|default_if_none:'' }}">
@@ -155,7 +153,6 @@
          {% endif %}
        </div>
 
-       <!-- Password -->
        <div class="input-group">
          <label for="id_password1">Password</label>
          <input type="password" name="password1" id="id_password1" placeholder="Enter your password">
@@ -166,7 +163,6 @@
          {% endif %}
        </div>
 
-       <!-- Password confirmation -->
        <div class="input-group">
          <label for="id_password2">Confirm Password</label>
          <input type="password" name="password2" id="id_password2" placeholder="Confirm your password">

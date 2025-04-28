@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-/* Base styles */
 body {
     font-family: 'Poppins', Arial, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -169,7 +168,6 @@ body {
     }
 }
 
-/* For very small devices */
 @media (max-width: 320px) {
     .login-container {
         padding: 20px;
@@ -181,14 +179,12 @@ body {
     }
 }
 
-/* For larger screens */
 @media (min-width: 1200px) {
     .login-container {
         max-width: 450px;
     }
 }
 
-/* For landscape orientation on mobile */
 @media (max-height: 600px) and (orientation: landscape) {
     body {
         align-items: flex-start;
