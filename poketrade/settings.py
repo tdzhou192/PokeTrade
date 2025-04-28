@@ -109,7 +109,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yazmenwalker22@gmail.com'  # Your Gmail address
-EMAIL_HOST_PASSWORD = 'zmja liwu uivg qyse'  # The App Password you just generated
+EMAIL_HOST_PASSWORD = 'wffu uanv xmol wrsw'  # The App Password you just generated
 DEFAULT_FROM_EMAIL = 'yazmenwalker22@gmail.com'
 
 # Internationalization
