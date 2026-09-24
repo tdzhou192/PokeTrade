@@ -1,0 +1,1 @@
+PokeTrade is a Django web application for Pokémon card collectors to manage their collections and trade cards with other users. Built as a team project at Georgia Tech, it integrates Pokémon data with a database-backed web application to support collection management and trading.
